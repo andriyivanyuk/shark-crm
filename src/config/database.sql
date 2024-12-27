@@ -1,4 +1,4 @@
-create table Person (
+create table Users (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   surName VARCHAR(255) NOT NULL,

@@ -7,11 +7,11 @@ class userController {
     const { name, surname, password, email } = req.body;
     const hashedPassword = await bcrypt.hash(password, 12);
     try {
-      const newPerson = await db.query(
-        "INSERT INTO person (name, surname, password, email) VALUES ($1, $2, $3, $4) RETURNING *",
+      const newUser = await db.query(
+        "INSERT INTO users (name, surname, password, email) VALUES ($1, $2, $3, $4) RETURNING *",
         [name, surname, hashedPassword, email]
       );
-      res.json(newPerson.rows[0]);
+      res.json(newUser.rows[0]);
     } catch (error) {
       console.error("Error creating user:", error);
       res.status(500).json({ message: "Internal server error" });
@@ -21,7 +21,7 @@ class userController {
   async loginUser(req, res) {
     const { email, password } = req.body;
     try {
-      const user = await db.query("SELECT * FROM person WHERE email = $1", [
+      const user = await db.query("SELECT * FROM users WHERE email = $1", [
         email,
       ]);
       if (user.rows.length > 0) {
@@ -50,7 +50,7 @@ class userController {
   async getUsers(req, res) {
     try {
       const users = await db.query(
-        "SELECT id, name, surname, email FROM Person"
+        "SELECT id, name, surname, email FROM users"
       );
       res.json(users.rows);
     } catch (error) {
@@ -63,7 +63,7 @@ class userController {
     const { id } = req.params;
     try {
       const user = await db.query(
-        "SELECT id, name, surname, email FROM person WHERE id = $1",
+        "SELECT id, name, surname, email FROM users WHERE id = $1",
         [id]
       );
       res.json(user.rows[0]);
@@ -77,7 +77,7 @@ class userController {
     const { id, name, surname, email } = req.body;
     try {
       const user = await db.query(
-        "UPDATE person SET name = $1, surname = $2, email = $4 WHERE id = $3 RETURNING *",
+        "UPDATE users SET name = $1, surname = $2, email = $4 WHERE id = $3 RETURNING *",
         [name, surname, id, email]
       );
       res.json(user.rows[0]);
@@ -90,7 +90,7 @@ class userController {
   async deleteUser(req, res) {
     const { id } = req.params;
     try {
-      const result = await db.query("DELETE FROM person WHERE id = $1", [id]);
+      const result = await db.query("DELETE FROM users WHERE id = $1", [id]);
       if (result.rowCount > 0) {
         res.json({ message: "User deleted successfully" });
       } else {
